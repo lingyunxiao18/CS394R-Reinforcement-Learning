@@ -5,7 +5,7 @@ This repository contains a Python implementation of various reinforcement learni
 
 ## Overview
 
-The core idea of this project is to demonstrate how an RL agent can learn to navigate an evacuation scenario by picking up evacuees from evacuating facilities and dropping them off at receiving facilities. The agent's goal is to maximize the total reward (cumulative evacuees transferred) within a given environment.
+The core idea of this project is to demonstrate how an RL agent can learn to navigate an evacuation scenario by picking up evacuees from evacuating facilities and dropping them off at receiving facilities. The agent's goal is to maximize the total return within a given environment.
 
 ## Usage
 
