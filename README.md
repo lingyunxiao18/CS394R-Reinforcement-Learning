@@ -1,5 +1,5 @@
-# Final Project of CS 394R: Reinforcement Learning, UT Austin
-## Emergency Supply Pre-positioning and Patient Evacuation via Reinforcement Learning
+#### Emergency Supply Pre-positioning and Patient Evacuation via Reinforcement Learning
+### Final Project of CS394R Reinforcement Learning: Theory and Practice -- Spring 2024
 
 This repository contains a Python implementation of various reinforcement learning (RL) agents that are designed to navigate and evacuate individuals in a simulated environment with evacuating and receiving facilities. The RL agent is trained using discrete (Sarsa, Q-Learning, Expected Sarsa) and continuous algorithms (REINFORCE, Actor-Critic) to maximize cumulative rewards by efficiently transferring evacuees from evacuating to receiving facilities. 
 
