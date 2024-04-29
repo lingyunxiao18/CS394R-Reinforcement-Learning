@@ -14,7 +14,7 @@ The core idea of this project is to demonstrate how an RL agent can learn to nav
 1. **Clone Repository**:
 
    ```bash
-   git clone git clone https://github.com/lingyunxiao18/CS394R-Reinforcement-Learning.git
+   git clone https://github.com/lingyunxiao18/CS394R-Reinforcement-Learning.git
    cd CS394R-Reinforcement-Learning
 
 2. **Run code**
