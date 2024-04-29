@@ -113,15 +113,6 @@ class Env:
         state = np.array(vehicle_state + self.num_evacuee_evacuating + self.num_evacuee_receiving)
         return state
 
-    # def render(self):
-    #     grid = np.zeros((self.grid_size, self.grid_size))
-    #     grid[self.vehicle_position[0], self.vehicle_position[1]] = 1
-    #     for facility in self.evacuating_facilities:
-    #         grid[facility[0], facility[1]] = 0.5
-    #     for facility in self.receiving_facilities:
-    #         grid[facility[0], facility[1]] = 0.8
-    #     print(grid)
-
 class ActorCritic(nn.Module):
     def __init__(self, state_dim, action_dim, hidden_dim):
         super(ActorCritic, self).__init__()
