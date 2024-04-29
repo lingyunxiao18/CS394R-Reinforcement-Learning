@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 
 class Env:
     def __init__(self):
-        self.grid_size = 3
-        self.num_evacuating_facilities = 3
+        self.grid_size = 10
+        self.num_evacuating_facilities = 2
         self.num_receiving_facilities = 5
         self.num_actions = 4
         self.num_evacuee_vehicle = 0
         self.vehicle_position = [3, 2]
-        self.evacuating_facilities = [[7, 2], [5, 1], [9, 1]]
+        self.evacuating_facilities = [[7, 2], [9, 1]]
         self.receiving_facilities = [[5, 5], [9, 3], [7, 6], [1, 9], [2, 2]]
-        self.num_evacuee_evacuating = [36, 15, 29]
+        self.num_evacuee_evacuating = [36, 29]
         self.remaining_receiving_capacity = [16, 37, 22, 44, 43] # Fixed
         self.num_evacuee_receiving = [0, 0, 0, 0, 0]
         self.time_step = 0
@@ -23,9 +23,9 @@ class Env:
 
     def reset(self):
         self.vehicle_position = [3, 2]
-        self.evacuating_facilities = [[7, 2], [5, 1], [9, 1]]
+        self.evacuating_facilities = [[7, 2], [9, 1]]
         self.receiving_facilities = [[5, 5], [9, 3], [7, 6], [1, 9], [2, 2]]
-        self.num_evacuee_evacuating = [36, 15, 29]
+        self.num_evacuee_evacuating = [36, 29]
         self.num_evacuee_receiving = [0, 0, 0, 0, 0]
         self.time_step = 0
         return self._get_state()
@@ -202,7 +202,7 @@ if __name__ == "__main__":
             # if env.time_step > max_steps_per_episode:
             #     break
                 
-        # print(state[-3:])
+        # print(state[-8:])
         # print(f"Episode {episode + 1}, Total Reward: {total_reward}, Total Time: {env.time_step}, Total Steps: {iter}")
         # print(trajectory)
                 

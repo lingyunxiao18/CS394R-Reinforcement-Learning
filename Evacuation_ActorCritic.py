@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 
 class Env:
     def __init__(self):
-        self.grid_size = 3
-        self.num_evacuating_facilities = 3
+        self.grid_size = 10
+        self.num_evacuating_facilities = 2
         self.num_receiving_facilities = 5
         self.num_actions = 4
         self.num_evacuee_vehicle = 0
         self.vehicle_position = [3, 2]
-        self.evacuating_facilities = [[7, 2], [5, 1], [9, 1]]
+        self.evacuating_facilities = [[7, 2], [9, 1]]
         self.receiving_facilities = [[5, 5], [9, 3], [7, 6], [1, 9], [2, 2]]
-        self.num_evacuee_evacuating = [36, 15, 29]
+        self.num_evacuee_evacuating = [36, 29]
         self.remaining_receiving_capacity = [16, 37, 22, 44, 43] # Fixed
         self.num_evacuee_receiving = [0, 0, 0, 0, 0]
         self.time_step = 0
@@ -23,9 +23,9 @@ class Env:
 
     def reset(self):
         self.vehicle_position = [3, 2]
-        self.evacuating_facilities = [[7, 2], [5, 1], [9, 1]]
+        self.evacuating_facilities = [[7, 2], [9, 1]]
         self.receiving_facilities = [[5, 5], [9, 3], [7, 6], [1, 9], [2, 2]]
-        self.num_evacuee_evacuating = [36, 15, 29]
+        self.num_evacuee_evacuating = [36, 29]
         self.num_evacuee_receiving = [0, 0, 0, 0, 0]
         self.time_step = 0
         return self._get_state()
@@ -55,7 +55,6 @@ class Env:
                         self.num_evacuee_evacuating[i] -= 1
                         self.num_evacuee_vehicle += 1
                         # print(f"Picked up an evacuee at {facility}!")
-                        # reward += 50
                         reward += 10*(self.num_evacuee_evacuating[i])
                     # else:
                     #     # print(f"Empty vehicle arrives at empty evacuating facility {facility}.")
@@ -76,7 +75,6 @@ class Env:
                         self.num_evacuee_receiving[i] += 1
                         self.num_evacuee_vehicle -= 1
                         # print(f"Dropped off an evacuee at {facility}!")
-                        # reward += 25
                         reward += 5*(self.remaining_receiving_capacity[i] - self.num_evacuee_receiving[i])
                     # else:
                     #     # Add negative signal if a loaded vehicle arrives at the full receiving facility
