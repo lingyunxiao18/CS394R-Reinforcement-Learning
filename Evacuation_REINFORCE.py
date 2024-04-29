@@ -202,7 +202,7 @@ if __name__ == "__main__":
             # if env.time_step > max_steps_per_episode:
             #     break
                 
-        # print(state[-8:])
+        # print(state[-(self.num_evacuating_facilities+self.num_receiving_facilities):])
         # print(f"Episode {episode + 1}, Total Reward: {total_reward}, Total Time: {env.time_step}, Total Steps: {iter}")
         # print(trajectory)
                 
