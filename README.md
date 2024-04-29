@@ -9,6 +9,16 @@ The core idea of this project is to demonstrate how an RL agent can learn to nav
 
 ## Usage
 
+### Dependencies
+
+This code requires the following Python libraries:
+
+- **`torch`**: PyTorch library for deep learning.
+- **`numpy`**: Numerical computing library.
+- **`matplotlib`**: Visualization library for plotting training results.
+
+Ensure that these dependencies are installed in your Python environment before running the code.
+
 ### Setup
 
 1. **Clone Repository**:
