@@ -189,145 +189,65 @@ class Actor_Critic_Agent:
         nn.utils.clip_grad_norm_(self.actor_critic.parameters(), self.max_grad_norm)
         self.optimizer.step()
 
-if __name__ == "__main__":
-    # Initialize environment
-    env = Env()
-    state_dim = env.grid_size * env.grid_size + env.num_evacuating_facilities + env.num_receiving_facilities
-    action_dim = env.num_actions
-
-    # Initialize agent
-    agent = Actor_Critic_Agent(state_dim, action_dim)
-
-    # Training loop
-    num_episodes = 200
-    max_steps_per_episode = 5000
-    total_rewards = []
-    time_steps = []
-    trajectories = []
-
-    for episode in range(num_episodes):
-        state = env.reset()
-        total_reward = 0
-        done = False
-        trajectory = [env.vehicle_position]
-        iter = 0
-
-        while not done:
-            # mask = agent.mask(action_dim, env.vehicle_position)
-            old_position = env.vehicle_position.copy()
-            action, log_probs, values = agent.select_action(state)
-            next_state, reward, done = env.step(action)
-            agent.update(log_probs=log_probs, values=values, rewards=[reward])
-            new_position = env.vehicle_position.copy()
-            
-            state = next_state
-            total_reward += reward
-            trajectory.append(env.vehicle_position.copy())
-
-            if old_position != new_position:
-                iter += 1
-
-            if env.time_step > max_steps_per_episode:
-                break
-                
-        # print(state[-3:])
-        print(f"Episode {episode + 1}, Total Reward: {total_reward}, Total Time: {env.time_step}, Total Steps: {iter}")
-        # print(trajectory)
-                
-        total_rewards.append(total_reward)
-        time_steps.append(iter)
-        trajectories.append(trajectory)
-
-    # print(total_rewards)
-
-    # Output trajectory after training
-    # print("Vehicle Trajectory After training:")
-    # for episode, episode_trajectory in enumerate(trajectory):
-    #     print(f"Episode {episode + 1}: {episode_trajectory}")
-
-    # Plotting the data
-    plt.plot(time_steps)
-    
-    # Adding labels and title
-    plt.xlabel('Episode')
-    plt.ylabel('Total Time')
-    plt.title('Total Time vs. Episode of Training')
-    
-    # Display the plot
-    plt.show()
-
-class ActorCritic(nn.Module):
+class Actor(nn.Module):
     def __init__(self, state_dim, action_dim, hidden_dim):
-        super(ActorCritic, self).__init__()
+        super(Actor, self).__init__()
         self.fc1 = nn.Linear(state_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        # self.rl2 = nn.LeakyReLU()
-        # self.fc3 = nn.Linear(hidden_dim, hidden_dim)
-        # self.rl3 = nn.LeakyReLU()
-        self.fc_actor = nn.Linear(hidden_dim, action_dim)
-        self.fc_critic = nn.Linear(hidden_dim, 1)
-        # self.dropout = nn.Dropout(0.5)
+        self.rl = nn.LeakyReLU()  
+        self.fc3 = nn.Linear(hidden_dim, action_dim)
+        self.dropout = nn.Dropout(0.5)
 
-    def forward(self, x, action_mask=None):
-        x = F.relu(self.fc1(x))
-        # x = self.dropout(x)
-        x = F.relu(self.fc2(x))
-        # x = F.relu(self.rl2(x))
-        logits = self.fc_actor(x)
-        # if action_mask is not None:
-        #     logits += (1 - action_mask) * -1e9
-        value = self.fc_critic(x)
-        return logits, value
+    def forward(self, x):
+        x = self.rl(self.fc1(x))  
+        x = self.dropout(x)
+        x = self.rl(self.fc2(x))  
+        logits = self.fc3(x)
+        return logits
 
-class Actor_Critic_Agent:
+class REINFORCE_Agent:
     def __init__(self, state_dim, action_dim, hidden_dim=128, lr=0.001, gamma=1, max_grad_norm=0.5):
-        self.actor_critic = ActorCritic(state_dim, action_dim, hidden_dim)
-        self.optimizer = optim.Adam(self.actor_critic.parameters(), lr=lr)
+        self.actor = Actor(state_dim, action_dim, hidden_dim)
+        self.optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.gamma = gamma
         self.max_grad_norm = max_grad_norm
 
     def select_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)
-        logits, values = self.actor_critic(state)
+        logits = self.actor(state)
         probs = F.softmax(logits, dim=-1)
         action = torch.multinomial(probs, 1)
-        log_probs = F.log_softmax(logits, dim=-1)
-        return action.item(), log_probs, values
+        log_prob = F.log_softmax(logits, dim=-1)[0, action]
+        return action.item(), log_prob
 
-    # def mask(self, action_dim, position):
-    #     action_mask = torch.ones(action_dim)
-    #     if position[0] == 0:
-    #         action_mask[0] = 0  # Disable 'Up' action if vehicle is at the top row
-    #     if position[0] == env.grid_size - 1:
-    #         action_mask[1] = 0  # Disable 'Down' action if vehicle is at the bottom row
-    #     if position[1] == 0:
-    #         action_mask[2] = 0  # Disable 'Left' action if vehicle is at the leftmost column
-    #     if position[1] == env.grid_size - 1:
-    #         action_mask[3] = 0  # Disable 'Right' action if vehicle is at the rightmost column
-    #     return action_mask
+    def update(self, rewards, log_probs):
+        discounted_returns = self.calculate_discounted_returns(rewards)
+        policy_loss = []
+        for log_prob, Gt in zip(log_probs, discounted_returns):
+            policy_loss.append(-log_prob * Gt)
+        policy_loss = torch.stack(policy_loss).sum()
 
-    def update(self, log_probs, values, rewards):
-        returns = []
-        R = 0
-        for r in rewards[::-1]:
-            R = r + self.gamma * R
-            returns.insert(0, R)
-        returns = torch.tensor(returns)
-        actor_loss = (-log_probs * (returns - values.detach())).mean()
-        critic_loss = F.smooth_l1_loss(values, returns.unsqueeze(1))
-        loss = actor_loss + critic_loss
         self.optimizer.zero_grad()
-        loss.backward()
-        nn.utils.clip_grad_norm_(self.actor_critic.parameters(), self.max_grad_norm)
+        policy_loss.backward()
+        nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
         self.optimizer.step()
 
+    def calculate_discounted_returns(self, rewards):
+        discounted_returns = []
+        R = 0
+        for r in reversed(rewards):
+            R = r + self.gamma * R
+            discounted_returns.insert(0, R)
+        return torch.tensor(discounted_returns)
+
 if __name__ == "__main__":
-    # Initialize environment
+    # Initialize the environment
     env = Env()
     state_dim = env.grid_size * env.grid_size + env.num_evacuating_facilities + env.num_receiving_facilities
     action_dim = env.num_actions
 
-    # Initialize agent
+    # Initialize the agent
+    agent = Actor_Critic_Agent(state_dim, action_dim)
     agent = Actor_Critic_Agent(state_dim, action_dim)
 
     # Training loop
@@ -372,13 +292,14 @@ if __name__ == "__main__":
     # for episode, episode_trajectory in enumerate(trajectory):
     #     print(f"Episode {episode + 1}: {episode_trajectory}")
 
-    # Plotting the data
-    plt.plot(time_steps)
-    
-    # Adding labels and title
+    plt.plot(total_rewards)
     plt.xlabel('Episode')
-    plt.ylabel('Total Time')
-    plt.title('Total Time vs. Episode of Training')
+    plt.ylabel('Return')
+    plt.title('Return vs. Training Episode')
+    plt.show()
     
-    # Display the plot
+    plt.plot(time_steps)
+    plt.xlabel('Episode')
+    plt.ylabel('Time Steps')
+    plt.title('Time Steps vs. Training Episode')
     plt.show()
