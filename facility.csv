@@ -1,0 +1,9 @@
+Facility,X,Y,BEDS,CATEGORY,Identifier
+r1,5,5,16,Receiving Hospital,1
+r2,9,3,37,Receiving Hospital,2
+r3,7,6,22,Receiving Hospital,3
+r4,1,9,44,Receiving Hospital,4
+r5,2,2,43,Receiving Hospital,5
+e1,7,2,36,Evacuating Hospital,6
+e2,9,1,29,Evacuating Hospital,7
+s1,3,2,,Staging Area,8
