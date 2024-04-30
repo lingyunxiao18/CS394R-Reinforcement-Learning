@@ -29,7 +29,13 @@ Ensure that these dependencies are installed in your Python environment before r
 
 2. **Run code for environment 1**
 
-3. **Run code for environment 2**
+    ```bash
+   python3 QLearning.py
+   python3 SARSA.py
+   python3 ExpectedSARSA.py
+   python3 Env1reinforce.py    
+
+4. **Run code for environment 2**
 
    ```bash
    python3 Evacuation_REINFORCE.py
