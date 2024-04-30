@@ -35,9 +35,14 @@ Ensure that these dependencies are installed in your Python environment before r
    python3 ExpectedSARSA.py
    python3 Env1reinforce.py    
 
-4. **Run code for environment 2**
+3. **Run code for environment 2**
 
    ```bash
    python3 Evacuation_REINFORCE.py
    python3 Evacuation_ActorCritic.py
+
+4. **Run code for Mixed Integer Programming Model**
+
+   ```bash
+   python3 MIP Model.py
 
