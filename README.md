@@ -44,5 +44,5 @@ Ensure that these dependencies are installed in your Python environment before r
 4. **Run code for Mixed Integer Programming Model**
 
    ```bash
-   python3 MIP Model.py
+   python3 MIP model.py
 
