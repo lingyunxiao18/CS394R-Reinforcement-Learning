@@ -180,3 +180,67 @@ if __name__ == "__main__":
     plt.show()
 
 print("\nElapsed time:", time.time() - start_time)
+
+
+# In[2]:
+#Hyperparameter tuning   
+facility_data = pd.read_csv('facility.csv')
+distance_data = pd.read_csv('distance.csv')
+vehicle_data = pd.read_csv('vehicle.csv')
+
+# Initialize environment
+env = EvacuationEnvironment(facility_data, distance_data, vehicle_data)
+   
+state_dim = env.Number_of_ranks * len(env.pairs) + len(env.I)
+action_dim = len(env.pairs)
+
+num_episodes = 100000    
+# Hyperparameter tuning
+alphas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+gammas = [0.99] #[0.9,0.95,0.99]
+epsilons = [0.2] #[0.1,0.3,0.5,0.7,0.9]
+
+best_reward = float('-inf')
+best_hyperparameters = None
+avg_reward_array=[]
+for alpha in alphas:   
+    for gamma in gammas:
+        for epsilon in epsilons:
+            agent = QLearningAgent(state_dim=state_dim, action_dim=action_dim, alpha=alpha, gamma=gamma, epsilon=epsilon)
+            total_rewards = []
+            for episode in range(num_episodes):
+                env.rank = 0
+                state = env.reset()
+                total_reward = 0
+                done = False
+
+                for rank in range(env.Number_of_ranks):          
+                    env.rank = rank
+                    action = agent.select_action(state)
+                    next_state, reward, done, _ = env.step(action, rank+1)
+                    agent.update(reward, next_state)
+                    state = next_state
+                    total_reward += reward
+
+                total_rewards.append(total_reward)
+                
+                
+            avg_reward = np.mean(total_rewards)
+            avg_reward_array.append(avg_reward)
+            
+            print(f'Alpha: {alpha}, Gamma: {gamma}, Epsilon: {epsilon}, Average Reward: {avg_reward}')
+
+            if avg_reward > best_reward:
+                best_reward = avg_reward
+                best_hyperparameters = (alpha, gamma, epsilon)
+
+            
+plt.figure(figsize=(12, 6))
+plt.plot(alphas, avg_reward_array, marker='o')
+plt.xlabel('Alpha')
+plt.ylabel('Average Reward')
+#plt.title('Average Reward vs. Alpha')
+plt.grid(True)
+plt.show()
+
+print(f'Best hyperparameters: {best_hyperparameters}, Best average reward: {best_reward}')
