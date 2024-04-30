@@ -27,7 +27,9 @@ Ensure that these dependencies are installed in your Python environment before r
    git clone https://github.com/lingyunxiao18/CS394R-Reinforcement-Learning.git
    cd CS394R-Reinforcement-Learning
 
-2. **Run code**
+2. **Run code for environment 1**
+
+3. **Run code for environment 2**
 
    ```bash
    python3 Evacuation_REINFORCE.py
